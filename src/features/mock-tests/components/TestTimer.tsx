@@ -1,0 +1,20 @@
+"use client";
+
+import { Clock } from "lucide-react";
+import { useCallback } from "react";
+
+export function TestTimer({ timeLeft }: { timeLeft: number }) {
+  const formatTime = useCallback((seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }, []);
+
+  return (
+    <div className="flex items-center gap-2 text-lg font-semibold">
+      <Clock className="h-5 w-5 text-primary" />
+      {formatTime(timeLeft)}
+    </div>
+  );
+}

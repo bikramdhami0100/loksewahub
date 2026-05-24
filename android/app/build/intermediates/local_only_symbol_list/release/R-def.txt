@@ -1,0 +1,10 @@
+R_DEF: Internal format may change without notice
+local
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+mipmap ic_launcher
+string app_name
+string asset_statements
+string host_name
+string launch_url
+style Theme.LoksewaHub

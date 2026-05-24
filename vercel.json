@@ -1,0 +1,35 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "crons": [
+    {
+      "path": "/api/cron/scrape-notices",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/scrape-current-affairs",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/generate-predictions",
+      "schedule": "0 0 * * 0"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "@mongodb-uri",
+    "AUTH_SECRET": "@auth-secret",
+    "AUTH_GOOGLE_ID": "@auth-google-id",
+    "AUTH_GOOGLE_SECRET": "@auth-google-secret",
+    "GEMINI_API_KEY": "@gemini-api-key",
+    "CLOUDINARY_CLOUD_NAME": "@cloudinary-cloud-name",
+    "CLOUDINARY_API_KEY": "@cloudinary-api-key",
+    "CLOUDINARY_API_SECRET": "@cloudinary-api-secret",
+    "SMTP_HOST": "@smtp-host",
+    "SMTP_PORT": "@smtp-port",
+    "SMTP_USER": "@smtp-user",
+    "SMTP_PASS": "@smtp-pass"
+  }
+}

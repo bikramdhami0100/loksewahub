@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.loksewahub.app",
+    "sha256_cert_fingerprints": ["FB:F0:0F:85:9B:D7:CB:51:2F:CD:F8:E0:7F:E2:A3:A7:2C:E1:7D:56:0F:2B:AF:9E:9E:99:FE:98:8A:E8:EB:FA"]
+  }
+}]

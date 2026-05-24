@@ -1,0 +1,10 @@
+com.loksewahub.app-core-1.1.0-0 C:\Users\Bikram Dhami\.gradle\caches\transforms-3\643c66effa7aeda37e0272f9c7c1f534\transformed\core-1.1.0\res
+com.loksewahub.app-browser-1.4.0-1 C:\Users\Bikram Dhami\.gradle\caches\transforms-3\91c77ca092d540b4ed5c3135b9c7a52a\transformed\browser-1.4.0\res
+com.loksewahub.app-jetified-androidbrowserhelper-2.5.0-2 C:\Users\Bikram Dhami\.gradle\caches\transforms-3\99ec272cf554f43824fe6c7aa63a4d49\transformed\jetified-androidbrowserhelper-2.5.0\res
+com.loksewahub.app-pngs-3 D:\other\loksewa\loksewahub\android\app\build\generated\res\pngs\release
+com.loksewahub.app-resValues-4 D:\other\loksewa\loksewahub\android\app\build\generated\res\resValues\release
+com.loksewahub.app-packageReleaseResources-5 D:\other\loksewa\loksewahub\android\app\build\intermediates\incremental\release\packageReleaseResources\merged.dir
+com.loksewahub.app-packageReleaseResources-6 D:\other\loksewa\loksewahub\android\app\build\intermediates\incremental\release\packageReleaseResources\stripped.dir
+com.loksewahub.app-merged_res-7 D:\other\loksewa\loksewahub\android\app\build\intermediates\merged_res\release
+com.loksewahub.app-main-8 D:\other\loksewa\loksewahub\android\app\src\main\res
+com.loksewahub.app-release-9 D:\other\loksewa\loksewahub\android\app\src\release\res
