@@ -1,4 +1,4 @@
-#Sun May 24 16:24:55 NPT 2026
+#Sun May 24 17:17:42 NPT 2026
 base.0=D\:\\other\\loksewa\\loksewahub\\android\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
 renamed.0=classes.dex
 path.0=classes.dex

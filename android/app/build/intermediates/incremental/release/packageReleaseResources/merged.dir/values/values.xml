@@ -5,11 +5,11 @@
         \"relation\": [\"delegate_permission/common.handle_all_urls\"],
         \"target\": {
             \"namespace\": \"web\",
-            \"site\": \"https://loksewahub.com\"
+            \"site\": \"https://loksewahub22v.vercel.app\"
         }
     }]</string>
-    <string name="host_name">loksewahub.com</string>
-    <string name="launch_url">https://loksewahub.com</string>
+    <string name="host_name">loksewahub22v.vercel.app</string>
+    <string name="launch_url">https://loksewahub22v.vercel.app</string>
     <style name="Theme.LoksewaHub" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">#1e40af</item>
         <item name="android:navigationBarColor">#ffffff</item>
