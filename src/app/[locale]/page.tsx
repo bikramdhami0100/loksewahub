@@ -1,44 +1,19 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  ArrowRight,
-  BookOpen,
-  FileText,
-  Brain,
-  ClipboardCheck,
-  TrendingUp,
-  Bell,
-  Sparkles,
-  GraduationCap,
-  Landmark,
-  Building,
-  Scale,
-  Shield,
-  ShieldCheck,
-  Sword,
-  Search,
-  ExternalLink,
-  Car,
-  Wallet,
-  Trees,
-  Map,
-  IdCard,
-  Plane,
-  Stethoscope,
-  School,
+  ArrowRight, BookOpen, FileText, Brain, ClipboardCheck,
+  TrendingUp, Bell, Sparkles, GraduationCap, Landmark, Building,
+  Scale, Shield, ShieldCheck, Sword, Search, ExternalLink, Car,
+  Wallet, Trees, Map, IdCard, Plane, Stethoscope, School,
+  MapPin, Award, Calendar, Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useLocale } from "@/providers/locale-provider";
 import { useGsapFadeIn, useGsapCounter } from "@/hooks/use-gsap";
-
-const features = [
-  { icon: FileText, titleKey: "home.step1Title", descKey: "home.step1Desc" },
-  { icon: BookOpen, titleKey: "home.step2Title", descKey: "home.step2Desc" },
-  { icon: Brain, titleKey: "home.step3Title", descKey: "home.step3Desc" },
-];
 
 const highlights = [
   { icon: Brain, labelKey: "AI Questions", desc: "Predict probable questions with AI" },
@@ -53,7 +28,7 @@ const governmentBodies = [
   {
     category: "exam-authorities",
     items: [
-      { name: "Loksewa Aayog (Public Service Commission)", nameNe: "लोक सेवा आयोग", url: "https://psc.gov.np", icon: GraduationCap },
+      { name: "Loksewa Aayog (Public Service Commission)", nameNe: "लोक सेवा आयोग", url: "/psc", icon: GraduationCap },
       { name: "Teacher Service Commission", nameNe: "शिक्षक सेवा आयोग", url: "https://tsc.gov.np", icon: GraduationCap },
       { name: "Koshi Province PSC", nameNe: "कोशी प्रदेश लोक सेवा", url: "https://psc.koshi.gov.np", icon: GraduationCap },
       { name: "Madhesh Province PSC", nameNe: "मधेश प्रदेश लोक सेवा", url: "https://ppsc.madhesh.gov.np", icon: GraduationCap },
@@ -116,56 +91,71 @@ const governmentBodies = [
   },
 ];
 
+interface PscNotice { id: number; title: string; title_np: string; upload_date: string; }
+interface ExamCenter { id: number; shown_heading: string; notice_no: string; date_upload: string; }
+interface PscResult { id: number; shown_heading: string; date_upload: string; type: string; }
+
+function stripHtml(html: string) { return html.replace(/<[^>]*>/g, "").trim(); }
+
 export default function LocaleHomePage() {
   const { t, locale } = useLocale();
-  const heroRef = useGsapFadeIn();
-  const featuresRef = useGsapFadeIn(0.2);
-  const highlightsRef = useGsapFadeIn(0.3);
+  const statsRef = useGsapFadeIn(0.1);
+  const highlightsRef = useGsapFadeIn(0.2);
   const ctaRef = useGsapFadeIn(0.4);
   const studentsRef = useGsapCounter(50000);
   const noticesRef = useGsapCounter(15000);
   const questionsRef = useGsapCounter(100000);
   const examsRef = useGsapCounter(200);
 
-  const title = locale === "ne"
-    ? "सरकारी परीक्षाको तयारीमा उत्कृष्ट बन्नुहोस्"
-    : "Ace Your Government Exam Preparation";
-  const subtitle = locale === "ne"
-    ? "लोकसेवा, शिक्षक सेवा, बैंकिङ र सबै सरकारी परीक्षाको तयारीको लागि एआई-संचालित सबैभन्दा व्यापक प्लेटफर्म"
-    : "Nepal's most comprehensive platform for Loksewa, TSC, Banking, and all government exam preparation with AI-powered tools";
+  const [pscNotices, setPscNotices] = useState<PscNotice[]>([]);
+  const [examCenters, setExamCenters] = useState<ExamCenter[]>([]);
+  const [results, setResults] = useState<PscResult[]>([]);
+  const [loading, setLoading] = useState({ notices: true, examCenters: true, results: true });
+
+  useEffect(() => {
+    fetch("/api/psc/notices?page=1").then((r) => r.json()).then((d) => {
+      setPscNotices(d?.data?.children?.data?.slice(0, 6) || []);
+      setLoading((p) => ({ ...p, notices: false }));
+    }).catch(() => setLoading((p) => ({ ...p, notices: false })));
+    fetch("/api/psc/exam-centers?page=1").then((r) => r.json()).then((d) => {
+      setExamCenters(d?.data?.dataList?.data?.slice(0, 6) || []);
+      setLoading((p) => ({ ...p, examCenters: false }));
+    }).catch(() => setLoading((p) => ({ ...p, examCenters: false })));
+    fetch("/api/psc/results?page=1").then((r) => r.json()).then((d) => {
+      setResults(d?.data?.dataList?.data?.slice(0, 6) || []);
+      setLoading((p) => ({ ...p, results: false }));
+    }).catch(() => setLoading((p) => ({ ...p, results: false })));
+  }, []);
+
+  const PscSection = ({ title, icon: Icon, loading: isLoading, children }: { title: string; icon: any; loading: boolean; children: React.ReactNode }) => (
+    <section className="border-t bg-gradient-to-b from-background to-muted/20">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10"><Icon className="h-5 w-5 text-primary" /></div>
+          <div><h2 className="text-2xl font-bold">{title}</h2><p className="text-sm text-muted-foreground">Public Service Commission Nepal</p></div>
+        </div>
+        {isLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div> : children}
+      </div>
+    </section>
+  );
 
   return (
     <div className="flex flex-col">
-      <section ref={heroRef} className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/5" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="secondary" className="mb-4">
-              <Sparkles className="mr-1 h-3.5 w-3.5" />
-              AI-Powered Learning Platform
-            </Badge>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              {title}
-            </h1>
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              {subtitle}
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href={`/${locale}/notes`}>
-                <Button size="lg" className="w-full sm:w-auto gap-2">
-                  {t("home.heroCta")}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href={`/${locale}/notices`}>
-                <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                  {t("home.heroCtaSecondary")}
-                </Button>
-              </Link>
-            </div>
+      {/* Minimal Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/5">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 text-center">
+          <Badge variant="secondary" className="mb-4"><Sparkles className="mr-1 h-3.5 w-3.5" />PSC Nepal Live Data</Badge>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            {locale === "ne" ? "सरकारी परीक्षाको तयारी" : "Government Exam Preparation"}
+          </h1>
+          <p className="mt-4 text-base text-muted-foreground max-w-xl mx-auto">
+            {locale === "ne" ? "लोकसेवा, शिक्षक सेवा, बैंकिङ र सबै सरकारी परीक्षाको तयारी" : "Nepal's platform for Loksewa, TSC, Banking & government exam preparation"}
+          </p>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href={`/${locale}/notes`}><Button size="lg" className="gap-2">{t("home.heroCta")}<ArrowRight className="h-4 w-4" /></Button></Link>
+            <Link href={`/${locale}/notices`}><Button variant="outline" size="lg">{t("home.heroCtaSecondary")}</Button></Link>
           </div>
-
-          <div className="mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4">
+          <div ref={statsRef} className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 max-w-2xl mx-auto">
             {[
               { ref: studentsRef, label: t("home.statsStudents"), suffix: "+" },
               { ref: noticesRef, label: t("home.statsNotices"), suffix: "+" },
@@ -173,61 +163,85 @@ export default function LocaleHomePage() {
               { ref: examsRef, label: t("home.statsExams"), suffix: "+" },
             ].map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-3xl font-bold text-primary">
-                  <span ref={stat.ref}>0</span>{stat.suffix}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+                <div className="text-2xl font-bold text-primary"><span ref={stat.ref}>0</span>{stat.suffix}</div>
+                <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* PSC Notices */}
+      <PscSection title={locale === "ne" ? "PSC सूचना विज्ञापन" : "PSC Notice Advertisements"} icon={Bell} loading={loading.notices}>
+        {pscNotices.length === 0 ? <p className="text-sm text-muted-foreground text-center py-8">No notices available</p> : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {pscNotices.map((n) => (
+              <Card key={n.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <p className="text-sm font-medium line-clamp-2">{locale === "ne" && n.title_np ? n.title_np : n.title}</p>
+                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground"><Calendar className="h-3 w-3" /><span>{n.upload_date}</span></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        <div className="mt-6 text-center">
+          <Link href={`/${locale}/psc`}><Button variant="outline" size="sm" className="gap-2"><ExternalLink className="h-4 w-4" />{locale === "ne" ? "सबै हेर्नुहोस्" : "View All"}</Button></Link>
+        </div>
+      </PscSection>
+
+      {/* PSC Exam Centers */}
+      <PscSection title={locale === "ne" ? "PSC परीक्षा केन्द्र" : "PSC Exam Centers"} icon={MapPin} loading={loading.examCenters}>
+        {examCenters.length === 0 ? <p className="text-sm text-muted-foreground text-center py-8">No exam centers available</p> : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {examCenters.map((ec) => (
+              <Card key={ec.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <p className="text-sm font-medium line-clamp-2">{stripHtml(ec.shown_heading)}</p>
+                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground"><Calendar className="h-3 w-3" /><span>{ec.date_upload}</span></div>
+                  {ec.notice_no && <p className="text-[10px] text-muted-foreground mt-1">Notice: {ec.notice_no}</p>}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        <div className="mt-6 text-center">
+          <Link href={`/${locale}/psc`}><Button variant="outline" size="sm" className="gap-2"><ExternalLink className="h-4 w-4" />{locale === "ne" ? "सबै हेर्नुहोस्" : "View All"}</Button></Link>
+        </div>
+      </PscSection>
+
+      {/* PSC Results */}
+      <PscSection title={locale === "ne" ? "PSC लिखित परिणाम" : "PSC Written Results"} icon={Award} loading={loading.results}>
+        {results.length === 0 ? <p className="text-sm text-muted-foreground text-center py-8">No results available</p> : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map((r) => (
+              <Card key={r.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <p className="text-sm font-medium line-clamp-2">{stripHtml(r.shown_heading)}</p>
+                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground"><Calendar className="h-3 w-3" /><span>{r.date_upload}</span><Badge variant="outline" className="ml-auto text-[10px]">{r.type}</Badge></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        <div className="mt-6 text-center">
+          <Link href={`/${locale}/psc`}><Button variant="outline" size="sm" className="gap-2"><ExternalLink className="h-4 w-4" />{locale === "ne" ? "सबै हेर्नुहोस्" : "View All"}</Button></Link>
+        </div>
+      </PscSection>
+
+      {/* Highlights */}
       <section ref={highlightsRef} className="border-t bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold">{t("home.featuresTitle")}</h2>
-            <p className="mt-2 text-muted-foreground">{t("home.featuresSubtitle")}</p>
-          </div>
+          <div className="text-center mb-10"><h2 className="text-3xl font-bold">{t("home.featuresTitle")}</h2><p className="mt-2 text-muted-foreground">{t("home.featuresSubtitle")}</p></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {highlights.map((item, i) => {
               const Icon = item.icon;
               return (
                 <Link key={i} href={`/${locale}/notes`} className="group block p-6 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all duration-200">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors"><Icon className="h-6 w-6 text-primary" /></div>
                   <h3 className="mt-4 font-semibold">{item.labelKey}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
                 </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section ref={featuresRef} className="border-t">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">{t("home.howItWorksTitle")}</h2>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {features.map((feature, i) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={i} className="text-center">
-                  <CardHeader>
-                    <div className="flex justify-center">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                        <Icon className="h-7 w-7 text-primary" />
-                      </div>
-                    </div>
-                    <CardTitle className="mt-2">{t(feature.titleKey)}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{t(feature.descKey)}</p>
-                  </CardContent>
-                </Card>
               );
             })}
           </div>
@@ -238,14 +252,10 @@ export default function LocaleHomePage() {
       <section className="border-t bg-gradient-to-b from-background to-muted/20">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-3">
-              <Landmark className="mr-1 h-3.5 w-3.5" />
-              {t("home.govtMinistries")}
-            </Badge>
+            <Badge variant="secondary" className="mb-3"><Landmark className="mr-1 h-3.5 w-3.5" />{t("home.govtMinistries")}</Badge>
             <h2 className="text-3xl font-bold">{t("home.governmentTitle")}</h2>
             <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">{t("home.governmentSubtitle")}</p>
           </div>
-
           <div className="space-y-10">
             {governmentBodies.map((group) => (
               <div key={group.category}>
@@ -257,24 +267,28 @@ export default function LocaleHomePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                   {group.items.map((body) => {
                     const Icon = body.icon;
-                    return (
-                      <a
-                        key={body.name}
-                        href={body.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex items-center gap-3 p-4 rounded-xl border bg-card hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-                      >
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <Icon className="h-5 w-5 text-primary" />
-                        </div>
+                    const isInternal = body.url.startsWith("/");
+                    const cardBody = (
+                      <>
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors"><Icon className="h-5 w-5 text-primary" /></div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium truncate">{locale === "ne" ? body.nameNe : body.name}</p>
                           <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                            {t("home.visitWebsite")}
-                            <ExternalLink className="h-3 w-3 inline" />
+                            {isInternal ? (locale === "ne" ? "लाइभ डाटा हेर्नुहोस्" : "View Live Data") : t("home.visitWebsite")}
+                            {isInternal ? null : <ExternalLink className="h-3 w-3 inline" />}
                           </p>
                         </div>
+                      </>
+                    );
+                    return isInternal ? (
+                      <Link key={body.name} href={`/${locale}${body.url}`}
+                        className="group flex items-center gap-3 p-4 rounded-xl border bg-card hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                        {cardBody}
+                      </Link>
+                    ) : (
+                      <a key={body.name} href={body.url} target="_blank" rel="noopener noreferrer"
+                        className="group flex items-center gap-3 p-4 rounded-xl border bg-card hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                        {cardBody}
                       </a>
                     );
                   })}
@@ -285,18 +299,13 @@ export default function LocaleHomePage() {
         </div>
       </section>
 
+      {/* CTA */}
       <section ref={ctaRef} className="border-t bg-primary/5">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold">{t("home.ctaTitle")}</h2>
-            <p className="mt-2 text-muted-foreground max-w-xl mx-auto">{t("home.ctaSubtitle")}</p>
-            <div className="mt-6">
-              <Link href={`/${locale}/dashboard`}>
-                <Button size="lg" className="gap-2">
-                  {t("home.ctaButton")} <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold">{t("home.ctaTitle")}</h2>
+          <p className="mt-2 text-muted-foreground max-w-xl mx-auto">{t("home.ctaSubtitle")}</p>
+          <div className="mt-6">
+            <Link href={`/${locale}/dashboard`}><Button size="lg" className="gap-2">{t("home.ctaButton")}<ArrowRight className="h-4 w-4" /></Button></Link>
           </div>
         </div>
       </section>
