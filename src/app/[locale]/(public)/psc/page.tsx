@@ -130,7 +130,7 @@ export default function PscPage() {
 
       <section ref={contentRef} className="border-t bg-gradient-to-b from-background to-muted/20">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-1 mb-8 border-b">
+          <div className="flex gap-1 mb-8 border-b overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -138,12 +138,13 @@ export default function PscPage() {
                 <button
                   key={tab.id}
                   onClick={() => { setActiveTab(tab.id); setPage(1); }}
-                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 transition-colors shrink-0 ${
                     isActive ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  {locale === "ne" ? tab.label.ne : tab.label.en}
+                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">{locale === "ne" ? tab.label.ne : tab.label.en}</span>
+                  <span className="xs:hidden">{locale === "ne" ? (tab.id === "notices" ? "सूचना" : tab.id === "exam-centers" ? "केन्द्र" : "नतिजा") : (tab.id === "notices" ? "Notices" : tab.id === "exam-centers" ? "Centers" : "Results")}</span>
                 </button>
               );
             })}
@@ -166,17 +167,17 @@ export default function PscPage() {
           </div>
 
           {selectedItem && (
-            <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 py-8">
-              <div className="relative w-full max-w-3xl mx-4 rounded-xl border bg-card shadow-2xl">
-                <div className="sticky top-0 flex items-center justify-between border-b bg-card px-6 py-4 rounded-t-xl z-10">
-                  <h2 className="text-lg font-semibold truncate pr-4">
+            <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 py-4 sm:py-8">
+              <div className="relative w-full max-w-3xl mx-2 sm:mx-4 rounded-xl border bg-card shadow-2xl">
+                <div className="sticky top-0 flex items-center justify-between border-b bg-card px-4 sm:px-6 py-3 sm:py-4 rounded-t-xl z-10">
+                  <h2 className="text-sm sm:text-lg font-semibold truncate pr-4">
                     {locale === "ne" ? "विवरण" : "Details"}
                   </h2>
                   <button onClick={() => setSelectedItem(null)} className="shrink-0 p-1 rounded-md hover:bg-muted transition-colors">
-                    <X className="h-5 w-5" />
+                    <X className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
                 </div>
-                <div className="px-6 py-6 space-y-5">
+                <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5">
                   <div>
                     <h3 className="text-base font-medium leading-relaxed">{getTitle(selectedItem)}</h3>
                     {selectedItem.notice_no && (
@@ -276,13 +277,13 @@ export default function PscPage() {
                 ))}
               </div>
 
-              <div className="flex items-center justify-center gap-2 mt-8">
+              <div className="flex items-center justify-center gap-1 sm:gap-2 mt-8">
                 <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-                  <ChevronLeft className="h-4 w-4 mr-1" />{locale === "ne" ? "अघिल्लो" : "Previous"}
+                  <ChevronLeft className="h-4 w-4" /><span className="hidden xs:inline ml-1">{locale === "ne" ? "अघिल्लो" : "Previous"}</span>
                 </Button>
-                <span className="text-sm text-muted-foreground px-4">Page {page}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground px-2 sm:px-4">{page}</span>
                 <Button variant="outline" size="sm" disabled={!hasMore} onClick={() => setPage((p) => p + 1)}>
-                  {locale === "ne" ? "पछिल्लो" : "Next"}<ChevronRight className="h-4 w-4 ml-1" />
+                  <span className="hidden xs:inline mr-1">{locale === "ne" ? "पछिल्लो" : "Next"}</span><ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             </>

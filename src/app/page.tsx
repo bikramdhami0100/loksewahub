@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { LocaleLink } from "@/components/shared/LocaleLink";
 import {
   ArrowRight, BookOpen, FileText, Brain, ClipboardCheck,
   TrendingUp, Bell, Sparkles, GraduationCap, Landmark, Building,
   Scale, Shield, ShieldCheck, Sword, Search, ExternalLink, Car,
   Wallet, Trees, Map, IdCard, Plane, Stethoscope, School,
-  MapPin, FileCheck, Award, Calendar, Loader2,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useLocale } from "@/providers/locale-provider";
 import { useGsapFadeIn, useGsapCounter } from "@/hooks/use-gsap";
 
@@ -62,13 +60,13 @@ const governmentBodies = [
       { name: "Election Commission", nameNe: "निर्वाचन आयोग", url: "https://www.election.gov.np", icon: Scale },
       { name: "CIAA", nameNe: "अख्तियार दुरुपयोग अनुसन्धान आयोग", url: "https://ciaa.gov.np", icon: Scale },
       { name: "Office of the Auditor General", nameNe: "महालेखापरीक्षकको कार्यालय", url: "https://www.oag.gov.np", icon: Scale },
-      { name: "Nepal Rastra Bank", nameNe: "नेपाल राष्ट्र बैंक", url: "https://www.nrb.org.np", icon: Landmark },
+      { name: "Nepal Rastra Bank", nameNe: "नेपाल राष्ट्र बैंक", url: "/nrb", icon: Landmark },
     ],
   },
   {
     category: "security",
     items: [
-      { name: "Nepal Police", nameNe: "नेपाल प्रहरी", url: "https://www.nepalpolice.gov.np", icon: Shield },
+      { name: "Nepal Police", nameNe: "नेपाल प्रहरी", url: "/nepal-police", icon: Shield },
       { name: "Armed Police Force", nameNe: "सशस्त्र प्रहरी बल", url: "https://www.apf.gov.np", icon: ShieldCheck },
       { name: "Nepali Army", nameNe: "नेपाली सेना", url: "https://www.nepalarmy.mil.np", icon: Sword },
       { name: "National Investigation Dept.", nameNe: "राष्ट्रिय अनुसन्धान विभाग", url: "https://www.nid.gov.np", icon: Search },
@@ -91,51 +89,6 @@ const governmentBodies = [
   },
 ];
 
-interface PscNotice {
-  id: number; title: string; title_np: string; upload_date: string; slug: string; is_scroll: number;
-}
-interface ExamCenter {
-  id: number; shown_heading: string; heading: string; notice_no: string; date_upload: string;
-}
-interface PscResult {
-  id: number; shown_heading: string; heading: string; date_upload: string; type: string;
-}
-
-async function fetchPsc<T>(endpoint: string): Promise<T | null> {
-  try {
-    const res = await fetch(`/api/psc/${endpoint}`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
-}
-
-function stripHtml(html: string) {
-  return html.replace(/<[^>]*>/g, "").trim();
-}
-
-function PscSection({ title, icon: Icon, loading, children }: { title: string; icon: any; loading: boolean; children: React.ReactNode }) {
-  return (
-    <section className="border-t bg-gradient-to-b from-background to-muted/20">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <Icon className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">{title}</h2>
-            <p className="text-sm text-muted-foreground">Public Service Commission Nepal</p>
-          </div>
-        </div>
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : children}
-      </div>
-    </section>
-  );
-}
-
 export default function HomePage() {
   const { t, locale } = useLocale();
   const statsRef = useGsapFadeIn(0.1);
@@ -146,33 +99,13 @@ export default function HomePage() {
   const questionsRef = useGsapCounter(100000);
   const examsRef = useGsapCounter(200);
 
-  const [notices, setNotices] = useState<PscNotice[]>([]);
-  const [examCenters, setExamCenters] = useState<ExamCenter[]>([]);
-  const [results, setResults] = useState<PscResult[]>([]);
-  const [loading, setLoading] = useState({ notices: true, examCenters: true, results: true });
-
-  useEffect(() => {
-    fetchPsc<{ data: { children: { data: PscNotice[] } } }>("notices?page=1").then((d) => {
-      setNotices(d?.data?.children?.data?.slice(0, 6) || []);
-      setLoading((p) => ({ ...p, notices: false }));
-    });
-    fetchPsc<{ data: { dataList: { data: ExamCenter[] } } }>("exam-centers?page=1").then((d) => {
-      setExamCenters(d?.data?.dataList?.data?.slice(0, 6) || []);
-      setLoading((p) => ({ ...p, examCenters: false }));
-    });
-    fetchPsc<{ data: { dataList: { data: PscResult[] } } }>("results?page=1").then((d) => {
-      setResults(d?.data?.dataList?.data?.slice(0, 6) || []);
-      setLoading((p) => ({ ...p, results: false }));
-    });
-  }, []);
-
   return (
     <div className="flex flex-col">
       {/* Minimal Hero - just a simple header */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/5">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 text-center">
           <Badge variant="secondary" className="mb-4">
-            <Sparkles className="mr-1 h-3.5 w-3.5" />PSC Nepal Live Data
+            <Sparkles className="mr-1 h-3.5 w-3.5" />{locale === "ne" ? "सरकारी निकायहरू" : "Government Bodies"}
           </Badge>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             {locale === "ne" ? "सरकारी परीक्षाको तयारी" : "Government Exam Preparation"}
@@ -201,82 +134,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PSC Notice Advertisements */}
-      <PscSection title={locale === "ne" ? "PSC सूचना विज्ञापन" : "PSC Notice Advertisements"} icon={Bell} loading={loading.notices}>
-        {notices.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No notices available</p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {notices.map((n) => (
-              <Card key={n.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <p className="text-sm font-medium line-clamp-2">{locale === "ne" && n.title_np ? n.title_np : n.title}</p>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" /><span>{n.upload_date}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-        <div className="mt-6 text-center">
-          <LocaleLink href="/psc">
-            <Button variant="outline" size="sm" className="gap-2"><ExternalLink className="h-4 w-4" />{locale === "ne" ? "सबै हेर्नुहोस्" : "View All"}</Button>
-          </LocaleLink>
-        </div>
-      </PscSection>
 
-      {/* PSC Exam Centers */}
-      <PscSection title={locale === "ne" ? "PSC परीक्षा केन्द्र" : "PSC Exam Centers"} icon={MapPin} loading={loading.examCenters}>
-        {examCenters.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No exam centers available</p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {examCenters.map((ec) => (
-              <Card key={ec.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <p className="text-sm font-medium line-clamp-2">{stripHtml(ec.shown_heading)}</p>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" /><span>{ec.date_upload}</span>
-                  </div>
-                  {ec.notice_no && <p className="text-[10px] text-muted-foreground mt-1">Notice: {ec.notice_no}</p>}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-        <div className="mt-6 text-center">
-          <LocaleLink href="/psc">
-            <Button variant="outline" size="sm" className="gap-2"><ExternalLink className="h-4 w-4" />{locale === "ne" ? "सबै हेर्नुहोस्" : "View All"}</Button>
-          </LocaleLink>
-        </div>
-      </PscSection>
-
-      {/* PSC Written Results */}
-      <PscSection title={locale === "ne" ? "PSC लिखित परिणाम" : "PSC Written Results"} icon={Award} loading={loading.results}>
-        {results.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No results available</p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((r) => (
-              <Card key={r.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <p className="text-sm font-medium line-clamp-2">{stripHtml(r.shown_heading)}</p>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" /><span>{r.date_upload}</span>
-                    <Badge variant="outline" className="ml-auto text-[10px]">{r.type}</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-        <div className="mt-6 text-center">
-          <LocaleLink href="/psc">
-            <Button variant="outline" size="sm" className="gap-2"><ExternalLink className="h-4 w-4" />{locale === "ne" ? "सबै हेर्नुहोस्" : "View All"}</Button>
-          </LocaleLink>
-        </div>
-      </PscSection>
 
       {/* Highlights */}
       <section ref={highlightsRef} className="border-t bg-muted/30">

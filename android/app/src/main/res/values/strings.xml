@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LoksewaHub</string>
-    <string name="launch_url">https://loksewahub22v.vercel.app</string>
-    <string name="host_name">loksewahub22v.vercel.app</string>
+    <string name="launch_url">https://loksewahub.vercel.app</string>
+    <string name="host_name">loksewahub.vercel.app</string>
     <string name="asset_statements">[{
         \"relation\": [\"delegate_permission/common.handle_all_urls\"],
         \"target\": {
             \"namespace\": \"web\",
-            \"site\": \"https://loksewahub22v.vercel.app\"
+            \"site\": \"https://loksewahub.vercel.app\"
         }
     }]</string>
 </resources>
